@@ -4,6 +4,8 @@ import './App.css'
 function App() {
   const [tasks, setTasks] = useState([]);
   const [newTask, setNewTask] = useState({})
+
+  const [liked, setLiked] = useState(true);
   
 
   function hanleInputChange(event) {
@@ -15,6 +17,30 @@ function App() {
     setTasks([...tasks, newTask]);
     console.log(tasks);
     
+  }
+  function filterTodo (text){
+    if(text == "active"){
+
+      const filteredTask = tasks.filter((el)=> {return el.isActive === true})
+      setTasks(filteredTask)
+    } else if (text == "completed"){
+
+      const filteredTask = tasks.filter((el)=> {return el.isActive === false})
+      setTasks(filteredTask)
+      console.log("completed daragdlaa");
+      
+    } else {
+      return;
+    }
+
+
+
+
+  }
+
+
+  const onchangeCheckBox = () => {
+
   }
 
   return (
@@ -32,13 +58,15 @@ function App() {
         </div>
         <div className='tab-main'>
           <button className='tab'>all</button>
-          <button onClick={checked} className='tab'>active</button>
-          <button className='tab'>completed</button>
+          <button onClick={()=>filterTodo("active")} checked={liked} className='tab'>
+           active
+          </button>
+          <button  onClick={()=>filterTodo("completed")} className='tab'>completed</button>
         </div>
         {
           tasks.length === 0 ? <p>no tasks yet . add one above</p> : tasks.map((task, index) =>
             <div style={{display: "flex", gap: "10px"}} key={index}>
-              <input type='checkbox'/>
+              <input type='checkbox' onChange={onchangeCheckBox()}/>
               <p className='taskshow'>{task.description}</p>
             </div>
           )
