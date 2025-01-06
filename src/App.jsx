@@ -64,9 +64,9 @@ function App() {
           </button>
         </div>
         <div className='tab-main'>
-          <button onClick={() => handleFilterStateChange("all")} className='tab'>all</button>
-          <button onClick={() => handleFilterStateChange("active")} className='tab'>active</button>
-          <button onClick={() => handleFilterStateChange("completed")} className='tab'>completed</button>
+          <button onClick={() => handleFilterStateChange("all")} style={{background: filterState=== "all" ? "lightblue" : "none"}} className='tab'>all</button>
+          <button onClick={() => handleFilterStateChange("active")} style={{background: filterState ==="active" ? "ligthblue" : "none"}} className='tab'>active</button>
+          <button onClick={() => handleFilterStateChange("completed")} style={{background: filterState ==="completed" ? "ligthblue" : "none"}} className='tab'>completed</button>
         </div>
         {
           tasks.length === 0 ? <p>no tasks yet . add one above</p> :
