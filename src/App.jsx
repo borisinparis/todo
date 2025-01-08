@@ -17,6 +17,7 @@ function App() {
 
   const [logs, setLogs] = useState([])
 
+
   // const mTime = moment().format("MMMM Do YYYY, h:mm:ss a")
 
   // const atMoment = () => {
@@ -29,9 +30,6 @@ function App() {
     setNewTask(event.target.value);
   }
   const addTask = () => {
-
-
-
     if (newTask.length === 0) {
       setError(true);
       alert("ta yum bichnuuu")
@@ -49,34 +47,43 @@ function App() {
 
     }
   }
-  console.log(tasks ,logs);
-
-
-
   const clearbottom = () => {
     const clearCompleted = tasks.filter((task) => task.status !== "completed")
     setTasks(clearCompleted)
   }
   const deletebottom = (id) => {
-    const deleted = tasks.filter((task) => task.id !== id)
-    setTasks(deleted)
-    setLogs([...logs, deleted])
-  }
+    // Find the task to be deleted
+    const taskToDelete = tasks.find((task) => task.id === id);
+  
+    // Update state to remove the task
+    const updatedTasks = tasks.filter((task) => task.id === id);
+    setTasks(updatedTasks);
+  
+    // If you want to keep logs of deleted tasks
+    if (taskToDelete) {
+      setLogs((prevLogs) => [...prevLogs, taskToDelete]);
+    }
+  };
 
   const handleFilterStateChange = (state) => {
     setFilterState(state);
   }
   const onChangeCheckBox = (id) => {
-    const taskOf = tasks.map((todo) => {
+    const updatedTasks = tasks.map((todo) => {
       if (todo.id === id) {
-        return { ...todo, status: todo.status === "active" ? "completed" : "active" }
+        if (todo.status === "active") {
+          return { ...todo, status: "completed" };
+        } else if (todo.status === "completed") {
+          return { ...todo, status: "logs" };
+        } else if (todo.status === "logs") {
+          return { ...todo, status: "active" };
+        }
       }
-      else {
-        return todo
-      }
-    })
-    setTasks(taskOf)
-  }
+      return todo; 
+    });
+    
+    setTasks(updatedTasks);
+  };
   return (
     <>
       <div className='main-contain'>
@@ -102,6 +109,8 @@ function App() {
 
               } else if (filterState === "completed") {
                 return todo.status === "completed"
+              } else if (filterState=== "logs") {
+                return todo.status ==="logs"
               }
               else {
                 return true
@@ -111,7 +120,7 @@ function App() {
                 <div className='todolists' key={todo.id}>
                   <input className='checker' type="checkbox" checked={todo.status === "completed"} onChange={() => onChangeCheckBox(todo.id)} />
                   <p className='taskshow'>{todo.status === "completed" ? <del>{todo.description}</del> : todo.description}</p> </div> </div>
-                <div onClick={() => { deletebottom(todo.id) }} className='deleter'>Delete</div> </button>
+                <div onClick={() => { deletebottom(todo.id)}} className='deleter'>Delete</div> </button>
 
             })
         }
