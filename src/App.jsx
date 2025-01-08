@@ -17,15 +17,6 @@ function App() {
 
   const [logs, setLogs] = useState([])
 
-
-  // const mTime = moment().format("MMMM Do YYYY, h:mm:ss a")
-
-  // const atMoment = () => {
-  //   const timer = tasks.filter((task)=> task.status === "active")
-  //   setMoment(timer)
-  // }
-
-
   const hanleInputChange = (event) => {
     setNewTask(event.target.value);
   }
@@ -36,34 +27,45 @@ function App() {
     }
     else {
       setError(false);
-      setTasks([...tasks, {
+      const newTodoTask = {
         description: newTask, id: uuidv4(), status: "active"
-      }]);
+      }
+      setTasks([...tasks, newTodoTask]);
       setNewTask("")
       setLogs([...logs, {
-        description: tasks, id: tasks.id
-        , logs: [{ status: "active", time: moment().format("h:mm:ss a") }]
-      }])
+        description: newTask,
+        id: newTodoTask.id,
+        logs: [{ status: "active", time: moment().format("h:mm:ss a") }]
+      }]);
 
     }
   }
+  console.log();
+
   const clearbottom = () => {
     const clearCompleted = tasks.filter((task) => task.status !== "completed")
     setTasks(clearCompleted)
   }
   const deletebottom = (id) => {
-    // Find the task to be deleted
-    const taskToDelete = tasks.find((task) => task.id === id);
-  
-    // Update state to remove the task
-    const updatedTasks = tasks.filter((task) => task.id === id);
+
+    const updatedTasks = tasks.filter((task) => task.id !== id);
     setTasks(updatedTasks);
-  
-    // If you want to keep logs of deleted tasks
-    if (taskToDelete) {
-      setLogs((prevLogs) => [...prevLogs, taskToDelete]);
-    }
+
+    const updatedLogs = logs.map((log) => {
+      if (log.id == id) {
+        return { ...log, logs: [...log.logs, { status: "deleted", time: moment().format("h:mm:ss a") }] }
+      }
+
+      return log
+    });
+    console.log(updatedLogs);
+
+    setLogs(updatedLogs)
   };
+
+
+  console.log(logs);
+
 
   const handleFilterStateChange = (state) => {
     setFilterState(state);
@@ -71,19 +73,23 @@ function App() {
   const onChangeCheckBox = (id) => {
     const updatedTasks = tasks.map((todo) => {
       if (todo.id === id) {
-        if (todo.status === "active") {
-          return { ...todo, status: "completed" };
-        } else if (todo.status === "completed") {
-          return { ...todo, status: "logs" };
-        } else if (todo.status === "logs") {
-          return { ...todo, status: "active" };
-        }
+        const newStatus = todo.status === "active" ? "completed" : "active";
+        const newLog = {
+          status: newStatus,
+          time: moment().format("h:mm:ss a"),
+        };
+        return {
+          ...todo,
+          status: newStatus,
+          logs: todo.logs ? [...todo.logs, newLog] : [newLog],
+        };
       }
-      return todo; 
+      return todo;
     });
-    
+  
     setTasks(updatedTasks);
   };
+  
   return (
     <>
       <div className='main-contain'>
@@ -101,6 +107,25 @@ function App() {
 
           })}
         </div>
+
+        {filterState === "logs" && logs.length > 0 && (
+  logs.map((value, index) => (
+    <div key={index}>
+      {value?.logs?.map((el, logIndex) => {
+        if (el.status === "active") {
+          return <p key={logIndex}>Created at: {el.time}</p>;
+        } else if (el.status === "deleted") {
+          return <p key={logIndex}>Deleted at: {el.time}</p>;
+        } else if (el.status === "completed") {
+          return <p key={logIndex}>Completed at: {el.time}</p>;
+        } else {
+          return null; 
+        }
+      })}
+    </div>
+  ))
+)}
+
         {
           tasks.length === 0 ? <p className='noyet'>No tasks yet. Add one above!</p> :
             tasks.filter((todo) => {
@@ -109,18 +134,16 @@ function App() {
 
               } else if (filterState === "completed") {
                 return todo.status === "completed"
-              } else if (filterState=== "logs") {
-                return todo.status ==="logs"
               }
-              else {
+              else if (filterState === "all") {
                 return true
               }
             }).map((todo) => {
-              return <button className='todomain'> <div>
+              return <button className='todomain' key={todo.id}> <div>
                 <div className='todolists' key={todo.id}>
-                  <input className='checker' type="checkbox" checked={todo.status === "completed"} onChange={() => onChangeCheckBox(todo.id)} />
+                  <input className='checker' type="checkbox" checked={todo.status === "completed" } onChange={() => onChangeCheckBox(todo.id)} />
                   <p className='taskshow'>{todo.status === "completed" ? <del>{todo.description}</del> : todo.description}</p> </div> </div>
-                <div onClick={() => { deletebottom(todo.id)}} className='deleter'>Delete</div> </button>
+                <div onClick={() => { deletebottom(todo.id) }} className='deleter'>Delete</div> </button>
 
             })
         }
@@ -129,7 +152,7 @@ function App() {
         }
         {
           tasks.length === 0 ? <div></div> : <div className='countertask'>
-            <div className='duusahh'> {tasks.filter(task => task.status === 'completed').length} of {tasks.length} tasks completed</div>
+            <div className='duusahh'> {tasks.filter(task => task.status === 'completed', ).length} of {tasks.length} tasks completed</div>
             <div className='duusah' onClick={clearbottom}>clear completed</div>
           </div>
         }
