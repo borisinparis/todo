@@ -2,6 +2,11 @@ import { useState } from 'react'
 import './App.css'
 import { v4 as uuidv4 } from 'uuid';
 import moment from "moment";
+import { Header } from "./component/Header";
+import { Footer } from "./component/Footer";
+import { LogsCard } from "./component/Logs-Card";
+import { Todocard } from "./component/Todo-Card";
+
 
 function App() {
 
@@ -20,6 +25,8 @@ function App() {
   const hanleInputChange = (event) => {
     setNewTask(event.target.value);
   }
+
+
   const addTask = () => {
     if (newTask.length === 0) {
       setError(true);
@@ -40,7 +47,6 @@ function App() {
 
     }
   }
-  console.log();
 
   const clearbottom = () => {
     const clearCompleted = tasks.filter((task) => task.status !== "completed")
@@ -72,7 +78,7 @@ function App() {
   }
   const onChangeCheckBox = (id) => {
     const task = tasks.find((task) => task.id === id)
-    const newStatus = todo.status === "active" ? "completed" : "active";
+    const newStatus = task.status === "active" ? "completed" : "active";
 
     const newLog = {
       status: newStatus,
@@ -86,20 +92,22 @@ function App() {
         return log
       }
     })
-    setLogs(updatedLogs)
 
     const updatedTasks = tasks.map((todo) => {
       if (todo.id === id) {
-        const newStatus = todo.status === "active" ? "completed" : "active";
+        const newStatuss = todo.status === "active" ? "completed" : "active";
         return {
-          ...todo, logs: [...todo.logs, newStatus] ,
+          ...todo,
+          status: newStatuss, 
         };
       }
       return todo;
     });
 
     setTasks(updatedTasks);
+    setLogs(updatedLogs)
   };
+  
 
   return (
     <>
@@ -115,13 +123,11 @@ function App() {
         <div className='tab-main'>
           {statusButton.map((el) => {
             return <button key={el} onClick={() => handleFilterStateChange(el)} style={{ background: filterState === el && "#3c82f6", color: filterState === el && 'white' }} className='tab'>{el}</button>
-
           })}
         </div>
-
         {filterState === "logs" && logs.length > 0 && (
           logs.map((value, index) => (
-            <div key={index}>
+            <div key={index}>{value.description}
               {value?.logs?.map((el, logIndex) => {
                 if (el.status === "active") {
                   return <p key={logIndex}>Created at: {el.time}</p>;
@@ -133,7 +139,7 @@ function App() {
                   return null;
                 }
               })}
-            </div>
+              </div>
           ))
         )}
 
