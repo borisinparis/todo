@@ -71,25 +71,36 @@ function App() {
     setFilterState(state);
   }
   const onChangeCheckBox = (id) => {
+    const task = tasks.find((task) => task.id === id)
+    const newStatus = todo.status === "active" ? "completed" : "active";
+
+    const newLog = {
+      status: newStatus,
+      time: moment().format("h:mm:ss a"),
+    };
+    const updatedLogs = logs.map((log) => {
+      if (log.id === id) {
+        return { ...log, logs: [...log.logs, newLog] }
+      }
+      else {
+        return log
+      }
+    })
+    setLogs(updatedLogs)
+
     const updatedTasks = tasks.map((todo) => {
       if (todo.id === id) {
         const newStatus = todo.status === "active" ? "completed" : "active";
-        const newLog = {
-          status: newStatus,
-          time: moment().format("h:mm:ss a"),
-        };
         return {
-          ...todo,
-          status: newStatus,
-          logs: todo.logs ? [...todo.logs, newLog] : [newLog],
+          ...todo, logs: [...todo.logs, newStatus] ,
         };
       }
       return todo;
     });
-  
+
     setTasks(updatedTasks);
   };
-  
+
   return (
     <>
       <div className='main-contain'>
@@ -109,22 +120,22 @@ function App() {
         </div>
 
         {filterState === "logs" && logs.length > 0 && (
-  logs.map((value, index) => (
-    <div key={index}>
-      {value?.logs?.map((el, logIndex) => {
-        if (el.status === "active") {
-          return <p key={logIndex}>Created at: {el.time}</p>;
-        } else if (el.status === "deleted") {
-          return <p key={logIndex}>Deleted at: {el.time}</p>;
-        } else if (el.status === "completed") {
-          return <p key={logIndex}>Completed at: {el.time}</p>;
-        } else {
-          return null; 
-        }
-      })}
-    </div>
-  ))
-)}
+          logs.map((value, index) => (
+            <div key={index}>
+              {value?.logs?.map((el, logIndex) => {
+                if (el.status === "active") {
+                  return <p key={logIndex}>Created at: {el.time}</p>;
+                } else if (el.status === "deleted") {
+                  return <p key={logIndex}>Deleted at: {el.time}</p>;
+                } else if (el.status === "completed") {
+                  return <p key={logIndex}>Completed at: {el.time}</p>;
+                } else {
+                  return null;
+                }
+              })}
+            </div>
+          ))
+        )}
 
         {
           tasks.length === 0 ? <p className='noyet'>No tasks yet. Add one above!</p> :
@@ -141,7 +152,7 @@ function App() {
             }).map((todo) => {
               return <button className='todomain' key={todo.id}> <div>
                 <div className='todolists' key={todo.id}>
-                  <input className='checker' type="checkbox" checked={todo.status === "completed" } onChange={() => onChangeCheckBox(todo.id)} />
+                  <input className='checker' type="checkbox" checked={todo.status === "completed"} onChange={() => onChangeCheckBox(todo.id)} />
                   <p className='taskshow'>{todo.status === "completed" ? <del>{todo.description}</del> : todo.description}</p> </div> </div>
                 <div onClick={() => { deletebottom(todo.id) }} className='deleter'>Delete</div> </button>
 
@@ -152,7 +163,7 @@ function App() {
         }
         {
           tasks.length === 0 ? <div></div> : <div className='countertask'>
-            <div className='duusahh'> {tasks.filter(task => task.status === 'completed', ).length} of {tasks.length} tasks completed</div>
+            <div className='duusahh'> {tasks.filter(task => task.status === 'completed',).length} of {tasks.length} tasks completed</div>
             <div className='duusah' onClick={clearbottom}>clear completed</div>
           </div>
         }
