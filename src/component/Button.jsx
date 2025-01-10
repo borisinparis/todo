@@ -5,3 +5,4 @@ const Button = (props) => {
         <button onClick={onClick} style={style}> {text} </button>
     )
 }
+export default Button;
